@@ -27,12 +27,14 @@ public class Delivery {
     @Comment("운행으로 인한 차감 보험금")
     private long balance;
 
+    private String deliveryId;
+
     @Embedded
     private Address address;
 
     @Comment("요청사 명")
     private String clientName;
-    @Comment("요청받은 콜 키 값")
+    @Comment("요청사로부터 요청받은 콜 키 값")
     @Column(length = 16)
     private String receiveCallId;
 
