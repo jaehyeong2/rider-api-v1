@@ -43,10 +43,10 @@ public class Rider extends BaseEntity {
     private String imagePath;
     private String policyNumber;
 
-    private String insuranceStatus;
+    private boolean insuranceApply;
 
     @Builder
-    public Rider(Seller seller, String driverId, String name, String phone, String password, int gender, String vcNumber, String region, String imagePath, String policyNumber, String insuranceStatus) {
+    public Rider(Seller seller, String driverId, String name, String phone, String password, int gender, String vcNumber, String region, String imagePath, String policyNumber, boolean insuranceApply) {
         this.seller = seller;
         this.driverId = driverId;
         this.name = name;
@@ -57,7 +57,7 @@ public class Rider extends BaseEntity {
         this.region = region;
         this.imagePath = imagePath;
         this.policyNumber = policyNumber;
-        this.insuranceStatus = insuranceStatus;
+        this.insuranceApply = insuranceApply;
     }
 
     public static Rider create(RiderCreate req, Seller seller){
@@ -69,6 +69,11 @@ public class Rider extends BaseEntity {
                 .vcNumber(req.getBikeNumber())
                 .phone(req.getPhone())
                 .name(req.getName())
+                .insuranceApply(false)
                 .build();
+    }
+
+    public void updateInsuranceApply(boolean insuranceApply) {
+        this.insuranceApply = insuranceApply;
     }
 }
