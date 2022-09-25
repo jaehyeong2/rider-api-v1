@@ -11,7 +11,7 @@ import jjfactory.simpleapi.business.insurance.dto.res.UnderWritingRes;
 import jjfactory.simpleapi.business.insurance.repository.InsuranceHistoryRepository;
 import jjfactory.simpleapi.business.insurance.repository.RejectRepository;
 import jjfactory.simpleapi.business.rider.domain.Rider;
-import jjfactory.simpleapi.business.rider.repository.RiderQueryRepository;
+import jjfactory.simpleapi.business.rider.repository.RiderRepositorySupport;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,9 +22,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Transactional
 @Service
-public class InsuranceService {
+public class InsuranceResultService {
     private final InsuranceHistoryRepository insuranceHistoryRepository;
-    private final RiderQueryRepository riderQueryRepository;
+    private final RiderRepositorySupport riderRepositorySupport;
     private final RejectRepository rejectRepository;
 
     public RiderCountRes underWritingResult(List<UnderWritingRes> results){
@@ -32,7 +32,7 @@ public class InsuranceService {
         List<Reject> rejects = new ArrayList<>();
 
             results.forEach(result->{
-                Rider rider = riderQueryRepository.findRiderByDriverId(result.getDriverId());
+                Rider rider = riderRepositorySupport.findRiderByDriverId(result.getDriverId());
                 // 승인이 아닌경우
                     if (!result.getResult().equals("accepted")) {
                         // 리뷰중이거나, 조건부 승인인경우
@@ -66,7 +66,7 @@ public class InsuranceService {
         List<Reject> rejects = new ArrayList<>();
 
             results.forEach(result->{
-                Rider rider = riderQueryRepository.findRiderByDriverId(result.getDriverId());
+                Rider rider = riderRepositorySupport.findRiderByDriverId(result.getDriverId());
 
                     // 기명 요청이 승인되지 않았을경우
                     if (!result.getResult().equals("endorsed")) {
@@ -96,7 +96,7 @@ public class InsuranceService {
         List<Reject> rejects = new ArrayList<>();
 
             results.forEach(result->{
-                Rider rider = riderQueryRepository.findRiderByDriverId(result.getDriverId());
+                Rider rider = riderRepositorySupport.findRiderByDriverId(result.getDriverId());
 
                     if (!result.getResult().equals("canceled")) {
                         InsuranceHistory insuranceHistory = InsuranceHistory.create(rider, HistoryType.REJECTED,8);
