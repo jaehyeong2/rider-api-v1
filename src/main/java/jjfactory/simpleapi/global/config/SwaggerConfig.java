@@ -3,6 +3,7 @@ package jjfactory.simpleapi.global.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -19,13 +20,13 @@ import java.util.Set;
 
 
 @Configuration
-@EnableSwagger2
+@EnableWebMvc
 public class SwaggerConfig {
     private ApiInfo apiInfo() {
         return new ApiInfoBuilder()
                 .title("mini-api")
                 .version("0.0.1")
-                .description("사내에서 개발했떤 시간제보험 연동 api를 간소화한 프로젝트")
+                .description("사내에서 개발했던 api를 간소화한 프로젝트")
                 .build();
     }
 
