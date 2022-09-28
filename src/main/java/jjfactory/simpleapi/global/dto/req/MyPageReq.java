@@ -14,4 +14,9 @@ public class MyPageReq {
     public PageRequest of(){
         return PageRequest.of(page-1,size);
     }
+
+    public MyPageReq(int page, int size) {
+        this.page = page;
+        this.size = size;
+    }
 }
