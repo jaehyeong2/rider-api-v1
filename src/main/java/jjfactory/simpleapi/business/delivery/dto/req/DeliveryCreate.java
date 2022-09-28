@@ -13,6 +13,7 @@ public class DeliveryCreate {
     private String pickUpAddress2;
     private String clientName;
     private String callId;
+    private String driverId;
 
     private String requestTime;
     private String appointTime;
