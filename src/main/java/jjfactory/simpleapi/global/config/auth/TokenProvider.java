@@ -13,7 +13,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -34,10 +33,9 @@ public class TokenProvider {
     private String secretKey;
 
 
-    // jwt 갱신 기능 안동작하고있음 (30분마다 갱신 안되고 24시간짜리 토큰 발급해줌)
     private static final long TOKEN_TIME = 1000L * 60 * 30;
     private static final long REFRESH_TOKEN_VALID_TIME =   1000L * 60 * 24 * 700;
-    private final UserDetailsService userDetailsService;
+    private final PrincipalDetailsService principalDetailsService;
 
     @PostConstruct
     protected  void init(){
@@ -61,7 +59,7 @@ public class TokenProvider {
 
 
     public Authentication getAuthentication(String token){
-        UserDetails user= userDetailsService.loadUserByUsername(getUserId(token));
+        UserDetails user= principalDetailsService.loadUserByUsername(getUserId(token));
 
         if(user == null){
             throw new EntityNotFoundException();

@@ -22,7 +22,7 @@ public class ExceptionFilter extends OncePerRequestFilter {
         try{
             filterChain.doFilter(request,response);
         } catch (EntityNotFoundException ex){
-            log.error("exception exception handler filter");
+            log.error("exception handler filter");
             setErrorResponse(HttpStatus.FORBIDDEN,response,ex);
         }
     }

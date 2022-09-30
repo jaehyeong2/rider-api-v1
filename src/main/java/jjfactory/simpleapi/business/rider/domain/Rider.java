@@ -79,6 +79,7 @@ public class Rider extends BaseEntity {
     public static Rider create(RiderCreate req, Seller seller,String encPassword){
         return Rider.builder()
                 .seller(seller)
+                .loginId(req.getLoginId())
                 .driverId("DD" + req.getPhone().substring(3))
                 .gender(req.getGender())
                 .region(req.getRegion())
