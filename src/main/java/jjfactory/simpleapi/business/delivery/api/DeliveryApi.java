@@ -43,8 +43,8 @@ public class DeliveryApi {
                 principalDetails.getRider()));
     }
 
-    @GetMapping
-    public ApiListRes<DeliveryRes> findDeliveriesIn3Days(@RequestParam String driverId){
+    @GetMapping("/{driverId}")
+    public ApiListRes<DeliveryRes> findDeliveriesIn3Days(@PathVariable String driverId){
         return new ApiListRes<>(deliveryService.find3DaysDeliveriesByDriverId(driverId));
     }
 }

@@ -69,7 +69,7 @@ public class InsuranceResultService {
                 Rider rider = riderRepositorySupport.findRiderByDriverId(result.getDriverId());
 
                     // 기명 요청이 승인되지 않았을경우
-                    if (!result.getResult().equals("endorsed")) {
+                    if (!result.getResult().equals("accepted")) {
                         //거절된 내역과 거절 사유 각 리스트에 저장
                         InsuranceHistory insuranceHistory = InsuranceHistory.create(rider, HistoryType.REJECTED,6);
                         histories.add(insuranceHistory);
@@ -98,7 +98,7 @@ public class InsuranceResultService {
             results.forEach(result->{
                 Rider rider = riderRepositorySupport.findRiderByDriverId(result.getDriverId());
 
-                    if (!result.getResult().equals("canceled")) {
+                    if (!result.getResult().equals("accepted")) {
                         InsuranceHistory insuranceHistory = InsuranceHistory.create(rider, HistoryType.REJECTED,8);
                         Reject reject = Reject.create(insuranceHistory, result.getResult());
                         histories.add(insuranceHistory);
@@ -108,7 +108,6 @@ public class InsuranceResultService {
                         InsuranceHistory insuranceHistory = InsuranceHistory.create(rider, HistoryType.ACCEPTED,8);
                         histories.add(insuranceHistory);
 
-                        //라이더 테이블에도 똑같이 상태값 바꿔줌
                         rider.updateInsuranceApply(false);
                     }
             });
