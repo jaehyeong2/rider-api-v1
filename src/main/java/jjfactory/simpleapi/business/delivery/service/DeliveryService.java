@@ -27,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.Duration;
+import java.util.List;
 
 @Slf4j
 @Transactional
@@ -40,7 +41,16 @@ public class DeliveryService {
     @Scheduled(cron = "0 0 06 * * *")
     @Transactional(readOnly = true)
     public void findAllDeliveriesToday(){
-        deliveryRepositorySupport.findDeliveriesAndBalanceToday();
+        List<DeliveryRes> deliveries = deliveryRepositorySupport.findDeliveriesAndBalanceToday();
+
+        try {
+            RetrofitConfig<DeliveryStartReq> retrofitConfig = new RetrofitConfig<>();
+            retrofitConfig.create(RetrofitApi.class).totalDeliveriesToday(deliveries).execute();
+
+        } catch (IOException e) {
+            log.error("error : {}",e);
+            throw new BusinessException(ErrorCode.RETROFIT_NETWORK_ERROR);
+        }
     }
 
     @Transactional(readOnly = true)
