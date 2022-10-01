@@ -46,6 +46,17 @@ public class DeliveryRepositorySupport {
                 .fetch();
     }
 
+    public List<DeliveryRes> findDeliveriesAndBalance3Days(String driverId){
+        return  queryFactory.select(Projections.constructor(DeliveryRes.class, delivery, balanceHistory))
+                .from(delivery)
+                .join(balanceHistory)
+                .on(delivery.eq(balanceHistory.delivery))
+                .where(between3Days(),
+                        delivery.rider.driverId.eq(driverId))
+                .orderBy(delivery.appointTime.desc())
+                .fetch();
+    }
+
     public Page<RiderDeliveryRes> findMyDeliveries(Pageable pageable,String startDate, String endDate, Long riderId){
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         LocalDateTime convertedStart = LocalDateTime.parse(startDate, formatter);
@@ -75,5 +86,9 @@ public class DeliveryRepositorySupport {
         return delivery.appointTime.between(
                 LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(6,0,0))
                 , LocalDateTime.of(LocalDate.now(), LocalTime.of(5,59,59)));
+    }
+
+    private BooleanExpression between3Days() {
+        return delivery.appointTime.between(LocalDateTime.now().minusDays(3),LocalDateTime.now());
     }
 }

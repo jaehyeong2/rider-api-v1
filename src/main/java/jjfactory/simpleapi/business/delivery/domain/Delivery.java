@@ -24,14 +24,9 @@ public class Delivery {
     @JoinColumn(name = "rider_id")
     @ManyToOne(fetch = FetchType.LAZY)
     private Rider rider;
-    @Comment("운행으로 인한 차감 보험금")
-    private long balance;
-
     private String deliveryId;
-
     @Embedded
     private Address address;
-
     @Comment("요청사 명")
     private String clientName;
     @Comment("요청사로부터 요청받은 콜 키 값")
@@ -59,7 +54,6 @@ public class Delivery {
     @Builder
     public Delivery(Rider rider, long balance, Address address, String receiveCallId, DeliveryStatus deliveryStatus, LocalDateTime requestTime, LocalDateTime appointTime, LocalDateTime pickUpTime, LocalDateTime completeTime, LocalDateTime modifiedDate, String clientName) {
         this.rider = rider;
-        this.balance = balance;
         this.address = address;
         this.receiveCallId = receiveCallId;
         this.deliveryStatus = deliveryStatus;
@@ -83,7 +77,7 @@ public class Delivery {
                         .pickUpAddress1(dto.getPickUpAddress1())
                         .pickUpAddress2(dto.getPickUpAddress2())
                         .build())
-                .receiveCallId(dto.getCallId())
+                .receiveCallId(dto.getReceiveId())
                 .clientName(dto.getClientName())
                 .requestTime(LocalDateTime.parse(dto.getRequestTime(),formatter))
                 .appointTime(LocalDateTime.parse(dto.getAppointTime(),formatter))
@@ -96,9 +90,6 @@ public class Delivery {
     }
     public void complete() {
         this.completeTime = LocalDateTime.now();
-    }
-    public void updateBalance(long balance) {
-        this.balance = balance;
     }
 
 }

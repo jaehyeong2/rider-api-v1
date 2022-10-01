@@ -15,6 +15,8 @@ import jjfactory.simpleapi.business.rider.domain.Rider;
 import jjfactory.simpleapi.business.seller.domain.Seller;
 import jjfactory.simpleapi.global.config.retrofit.RetrofitApi;
 import jjfactory.simpleapi.global.config.retrofit.RetrofitConfig;
+import jjfactory.simpleapi.global.dto.res.ApiListRes;
+import jjfactory.simpleapi.global.dto.res.ApiRes;
 import jjfactory.simpleapi.global.dto.res.PagingRes;
 import jjfactory.simpleapi.global.ex.BusinessException;
 import jjfactory.simpleapi.global.ex.ErrorCode;
@@ -37,6 +39,11 @@ public class DeliveryService {
     private final DeliveryRepository deliveryRepository;
     private final BalanceHistoryRepository balanceHistoryRepository;
     private final DeliveryRepositorySupport deliveryRepositorySupport;
+
+    @Transactional(readOnly = true)
+    public List<DeliveryRes> find3DaysDeliveriesByDriverId(String driverId){
+        return deliveryRepositorySupport.findDeliveriesAndBalance3Days(driverId);
+    }
 
     @Scheduled(cron = "0 0 06 * * *")
     @Transactional(readOnly = true)
