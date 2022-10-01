@@ -1,28 +1,32 @@
 package jjfactory.simpleapi.business.delivery.repository;
 
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jjfactory.simpleapi.business.accident.domain.Accident;
+import jjfactory.simpleapi.business.balance.domain.BalanceHistory;
 import jjfactory.simpleapi.business.delivery.domain.Address;
 import jjfactory.simpleapi.business.delivery.domain.Delivery;
 import jjfactory.simpleapi.business.delivery.dto.DeliveryRes;
 import jjfactory.simpleapi.business.rider.domain.Rider;
 import jjfactory.simpleapi.business.seller.domain.Seller;
 import jjfactory.simpleapi.global.dto.req.MyPageReq;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 
 import javax.persistence.EntityManager;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+import static jjfactory.simpleapi.business.balance.domain.QBalanceHistory.balanceHistory;
 import static jjfactory.simpleapi.business.delivery.domain.QDelivery.delivery;
 import static org.assertj.core.api.Assertions.*;
 
@@ -37,11 +41,35 @@ class DeliveryRepositorySupportTest {
     Long idTmp = 0L;
 
     @BeforeEach
-    public void init() {
+    public void init(TestInfo info) {
         queryFactory = new JPAQueryFactory(em);
         Rider rider = createRiderAndSeller();
         idTmp = rider.getId();
-        createDeliveries(rider);
+
+        if(info.getDisplayName().equals("하루 전체 운행 아력조회 성공")){
+            createDeliveriesAndBalanceHistory2(rider);
+        }else{
+            createDeliveriesAndBalanceHistory(rider);
+        }
+    }
+
+    @Test
+    @DisplayName("하루 전체 운행 아력조회 성공")
+    void findTotalDeliveriesToday() {
+        //when
+        List<DeliveryRes> deliveries = queryFactory.select(Projections.constructor(DeliveryRes.class, delivery, balanceHistory))
+                .from(delivery)
+                .join(balanceHistory)
+                .on(delivery.eq(balanceHistory.delivery))
+                .where(betweenToday())
+                .orderBy(delivery.appointTime.desc())
+                .fetch();
+
+        int sum = deliveries.stream().mapToInt(DeliveryRes::getBalance).sum();
+
+        //then
+        assertThat(deliveries.size()).isEqualTo(8);
+        assertThat(sum).isEqualTo(800);
     }
 
     @Test
@@ -96,9 +124,11 @@ class DeliveryRepositorySupportTest {
         return rider;
     }
 
-    private void createDeliveries(Rider rider) {
+    private void createDeliveriesAndBalanceHistory(Rider rider) {
         for(int i = 1; i<16; i++){
-            LocalDateTime appointTime = ( i%2 == 0 ) ?  LocalDateTime.now() : LocalDateTime.now().minusMonths(3);
+            LocalDateTime appointTime = ( i%2 == 0 ) ?
+                    LocalDateTime.of(2022,8,1,0,0,0)
+                    : LocalDateTime.now().minusMonths(3);
 
             Delivery delivery = Delivery.builder()
                     .rider(rider)
@@ -106,8 +136,36 @@ class DeliveryRepositorySupportTest {
                     .address(new Address("주소1","주소2","배달주소1","배달주소2"))
                     .build();
 
-            em.persist(delivery);
+            BalanceHistory balanceHistory = BalanceHistory.create(100, delivery);
 
+            em.persist(delivery);
+            em.persist(balanceHistory);
         }
     }
+
+    private void createDeliveriesAndBalanceHistory2(Rider rider) {
+        for(int i = 1; i<16; i++){
+            LocalDateTime appointTime = ( i%2 == 0 ) ?
+                    LocalDateTime.now()
+                    : LocalDateTime.now().minusDays(1);
+
+            Delivery delivery = Delivery.builder()
+                    .rider(rider)
+                    .appointTime(appointTime.plusMinutes(i))
+                    .address(new Address("주소1","주소2","배달주소1","배달주소2"))
+                    .build();
+
+            BalanceHistory balanceHistory = BalanceHistory.create(100, delivery);
+
+            em.persist(delivery);
+            em.persist(balanceHistory);
+        }
+    }
+
+    private BooleanExpression betweenToday() {
+        return delivery.appointTime.between(
+                LocalDateTime.of(LocalDate.now().minusDays(1), LocalTime.of(6,0,0))
+                , LocalDateTime.of(LocalDate.now(), LocalTime.of(5,59,59)));
+    }
+
 }
