@@ -1,7 +1,10 @@
 package jjfactory.simpleapi.business.accident.repository;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jjfactory.simpleapi.business.accident.domain.Accident;
+import jjfactory.simpleapi.business.accident.dto.res.AccidentRes;
+import jjfactory.simpleapi.business.delivery.domain.Address;
 import jjfactory.simpleapi.business.delivery.domain.Delivery;
 import jjfactory.simpleapi.business.rider.domain.Rider;
 import jjfactory.simpleapi.business.seller.domain.Seller;
@@ -39,8 +42,6 @@ class AccidentRepositorySupportTest {
         createDeliveriesAndAccidents(rider);
     }
 
-
-
     @Test
     @DisplayName("라이더 개인 사고 조회 성공")
     void findAccidentsByPhone() {
@@ -48,23 +49,24 @@ class AccidentRepositorySupportTest {
         PageRequest pageReq = new MyPageReq(1, 10).of();
 
         //when
-        List<Accident> accidents = queryFactory.selectFrom(accident)
-                .where(accident.delivery.rider.phone.eq("01012341234"))
+        List<AccidentRes> accidents = queryFactory.select(Projections.constructor(AccidentRes.class, accident, delivery))
+                .from(accident)
+                .innerJoin(delivery).on(accident.delivery.eq(delivery))
+                .where(delivery.rider.phone.eq("01012341234"))
                 .orderBy(accident.accidentTime.desc())
                 .offset(pageReq.getOffset())
                 .limit(pageReq.getPageSize())
                 .fetch();
 
-        int total = queryFactory.selectFrom(accident)
-                .where(accident.delivery.rider.phone.eq("01012341234"))
-                .orderBy(accident.accidentTime.desc())
+        int total = queryFactory.select(Projections.constructor(AccidentRes.class, accident, delivery))
+                .from(accident)
+                .innerJoin(delivery).on(accident.delivery.eq(delivery))
+                .where(delivery.rider.phone.eq("01012341234"))
                 .fetch().size();
 
         //then
         assertThat(total).isEqualTo(15);
-        assertThat(accidents.size()).isEqualTo(10);
-        assertThat(accidents.get(0).getAccidentTime())
-                .isAfter(accidents.get(9).getAccidentTime());
+        assertThat(accidents.get(0).getAccidentTime()).isEqualTo("2022-09-30 15:00:00");
     }
 
     @Test
@@ -82,6 +84,7 @@ class AccidentRepositorySupportTest {
                 .where(seller.sellerCode.eq("dddd1111wwww"))
                 .fetchOne();
 
+        //then
         assertThat(totalCompensation).isEqualTo(15000);
     }
 
@@ -89,6 +92,12 @@ class AccidentRepositorySupportTest {
         for(int i = 1; i<16; i++){
             Delivery delivery = Delivery.builder()
                     .rider(rider)
+                    .address(Address.builder()
+                            .pickUpAddress1("맘스터치 광진점")
+                            .pickUpAddress2("111-ddd")
+                            .deliveryAddress1("군자로 7길 xx")
+                            .deliveryAddress2("111-XXX")
+                            .build())
                     .build();
 
             em.persist(delivery);
@@ -96,7 +105,7 @@ class AccidentRepositorySupportTest {
             Accident findAccident = Accident.builder()
                     .delivery(delivery)
                     .compensation(1000)
-                    .accidentTime(LocalDateTime.now())
+                    .accidentTime(LocalDateTime.of(2022,9,30,i,0,0))
                     .build();
 
             em.persist(findAccident);

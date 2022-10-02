@@ -1,9 +1,11 @@
 package jjfactory.simpleapi.business.accident.repository;
 
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jjfactory.simpleapi.business.accident.domain.Accident;
 import jjfactory.simpleapi.business.accident.domain.QAccident;
+import jjfactory.simpleapi.business.accident.dto.res.AccidentRes;
 import jjfactory.simpleapi.business.delivery.domain.QDelivery;
 import jjfactory.simpleapi.business.rider.domain.QRider;
 import jjfactory.simpleapi.business.seller.domain.QSeller;
@@ -24,17 +26,20 @@ import static jjfactory.simpleapi.business.seller.domain.QSeller.*;
 public class AccidentRepositorySupport {
     private final JPAQueryFactory queryFactory;
 
-    public Page<Accident> findAccidentsByPhone(Pageable pageable, String phone){
-        List<Accident> accidents = queryFactory.selectFrom(accident)
-                .where(accident.delivery.rider.phone.eq(phone))
+    public Page<AccidentRes> findAccidentsByPhone(Pageable pageable, String phone){
+        List<AccidentRes> accidents = queryFactory.select(Projections.constructor(AccidentRes.class, accident, delivery))
+                .from(accident)
+                .innerJoin(delivery).on(accident.delivery.eq(delivery))
+                .where(delivery.rider.phone.eq(phone))
                 .orderBy(accident.accidentTime.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        int total = queryFactory.selectFrom(accident)
-                .where(accident.delivery.rider.phone.eq(phone))
-                .orderBy(accident.accidentTime.desc())
+        int total = queryFactory.select(Projections.constructor(AccidentRes.class, accident, delivery))
+                .from(accident)
+                .innerJoin(delivery).on(accident.delivery.eq(delivery))
+                .where(delivery.rider.phone.eq(phone))
                 .fetch().size();
 
         return new PageImpl<>(accidents,pageable,total);
