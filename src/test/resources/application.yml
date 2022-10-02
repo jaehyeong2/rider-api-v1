@@ -11,6 +11,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
-logging:
-  level:
-    org.hibernate.SQL: debug
+#logging:
+#  level:
+#    org.hibernate.SQL: debug
+
+
+hash: test1111test1111test1111ttdd11@#
+
+app:
+  filePath: test/test

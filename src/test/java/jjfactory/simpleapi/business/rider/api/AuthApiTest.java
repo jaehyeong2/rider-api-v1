@@ -1,6 +1,7 @@
 package jjfactory.simpleapi.business.rider.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jjfactory.simpleapi.business.balance.api.ReceiveBalanceApi;
 import jjfactory.simpleapi.business.rider.dto.req.LoginReq;
 import jjfactory.simpleapi.business.rider.dto.req.RiderCreate;
 import jjfactory.simpleapi.business.rider.repository.RiderRepository;
@@ -11,9 +12,14 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,16 +36,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@Transactional
-@SpringBootTest
+@WebMvcTest(controllers = AuthApi.class,
+        excludeFilters = {
+                @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurerAdapter.class)}
+)
 class AuthApiTest {
     @Autowired
     private WebApplicationContext context;
-    @Autowired
+    @MockBean
     AuthService authService;
-    @Autowired
-    RiderRepository riderRepository;
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -65,8 +70,7 @@ class AuthApiTest {
         //expected
         mockMvc.perform(post("/auth/login").content(mapper.writeValueAsString(loginReq))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.result.jwtToken").isNotEmpty());
+                .andExpect(status().isOk());
 
     }
 
