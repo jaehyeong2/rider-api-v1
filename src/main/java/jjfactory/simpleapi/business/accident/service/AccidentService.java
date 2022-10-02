@@ -8,6 +8,7 @@ import jjfactory.simpleapi.business.accident.repository.AccidentRepositorySuppor
 import jjfactory.simpleapi.business.delivery.domain.Delivery;
 import jjfactory.simpleapi.business.delivery.repository.DeliveryRepository;
 import jjfactory.simpleapi.business.delivery.repository.DeliveryRepositorySupport;
+import jjfactory.simpleapi.business.rider.domain.Rider;
 import jjfactory.simpleapi.global.dto.res.PagingRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -23,19 +24,21 @@ public class AccidentService {
     private final AccidentRepository accidentRepository;
     private final AccidentRepositorySupport accidentRepositorySupport;
     private final DeliveryRepository deliveryRepository;
-    private final DeliveryRepositorySupport deliveryRepositorySupport;
 
-    public void createAccident(AccidentCreate dto){
+    public Long createAccident(AccidentCreate dto){
         Delivery delivery = deliveryRepository.findByDeliveryId(dto.getDeliveryId()).orElseThrow(NoSuchElementException::new);
         Accident accident = Accident.create(dto, delivery);
         accidentRepository.save(accident);
 
+        return accident.getId();
     }
 
-    public PagingRes<Accident> findAccidentsByPhone(Pageable pageable, String phone){
-        return new PagingRes(accidentRepositorySupport.findAccidentsByPhone(pageable,phone));
+    @Transactional(readOnly = true)
+    public PagingRes<Accident> findMyAccidentsByPhone(Pageable pageable, Rider rider){
+        return new PagingRes(accidentRepositorySupport.findAccidentsByPhone(pageable,rider.getPhone()));
     }
 
+    @Transactional(readOnly = true)
     public Integer findTotalCompensation(String sellerCode){
         return accidentRepositorySupport.findTotalCompensation(sellerCode);
     }
