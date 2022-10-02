@@ -3,7 +3,7 @@ package jjfactory.simpleapi.business.delivery.repository;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jjfactory.simpleapi.business.balance.domain.BalanceHistory;
+import jjfactory.simpleapi.business.delivery.domain.BalanceHistory;
 import jjfactory.simpleapi.business.delivery.domain.Address;
 import jjfactory.simpleapi.business.delivery.domain.Delivery;
 import jjfactory.simpleapi.business.delivery.dto.DeliveryRes;
@@ -26,7 +26,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static jjfactory.simpleapi.business.balance.domain.QBalanceHistory.balanceHistory;
+import static jjfactory.simpleapi.business.delivery.domain.QBalanceHistory.balanceHistory;
 import static jjfactory.simpleapi.business.delivery.domain.QDelivery.delivery;
 import static org.assertj.core.api.Assertions.*;
 

@@ -19,7 +19,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static jjfactory.simpleapi.business.balance.domain.QBalanceHistory.*;
+import static jjfactory.simpleapi.business.delivery.domain.QBalanceHistory.balanceHistory;
 import static jjfactory.simpleapi.business.delivery.domain.QDelivery.*;
 
 @Repository

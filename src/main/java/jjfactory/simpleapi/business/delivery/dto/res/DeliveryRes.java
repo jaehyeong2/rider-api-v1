@@ -1,7 +1,7 @@
 package jjfactory.simpleapi.business.delivery.dto;
 
 
-import jjfactory.simpleapi.business.balance.domain.BalanceHistory;
+import jjfactory.simpleapi.business.delivery.domain.BalanceHistory;
 import jjfactory.simpleapi.business.delivery.domain.Delivery;
 import lombok.Builder;
 import lombok.Getter;
