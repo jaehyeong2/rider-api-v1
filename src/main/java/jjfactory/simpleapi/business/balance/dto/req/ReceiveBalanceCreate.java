@@ -1,6 +1,7 @@
 package jjfactory.simpleapi.business.balance.dto.req;
 
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -15,6 +16,7 @@ public class ReceiveBalanceCreate {
     @NotEmpty
     private String batchDate;
 
+    @Builder
     public ReceiveBalanceCreate(int balance, String batchDate) {
         this.balance = balance;
         this.batchDate = batchDate;
