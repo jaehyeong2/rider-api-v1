@@ -1,10 +1,12 @@
 package jjfactory.simpleapi.business.rider.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jjfactory.simpleapi.business.TestPrincipalDetailsService;
 import jjfactory.simpleapi.business.rider.dto.req.LoginReq;
 import jjfactory.simpleapi.business.rider.dto.req.RiderCreate;
 import jjfactory.simpleapi.business.rider.service.AuthService;
 import jjfactory.simpleapi.business.rider.service.RiderService;
+import jjfactory.simpleapi.global.config.auth.PrincipalDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,6 +24,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.nio.charset.StandardCharsets;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -44,11 +48,34 @@ class RiderApiTest {
     @Autowired
     ObjectMapper mapper;
 
+    private final TestPrincipalDetailsService testUserDetailsService = new TestPrincipalDetailsService();
+    private PrincipalDetails principalDetails;
+
     @BeforeEach
     public void init() {
         mockMvc = MockMvcBuilders
                 .webAppContextSetup(context)
+                .apply(springSecurity())
                 .alwaysDo(print()).build();
+
+        principalDetails = (PrincipalDetails) testUserDetailsService.loadUserByUsername(TestPrincipalDetailsService.USERNAME);
+    }
+
+    @Test
+    @DisplayName("보험 적용상태 조회")
+    void getInsuranceStatus() throws Exception {
+        //expected
+        mockMvc.perform(get("/riders/insurance").with(user(principalDetails)))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @DisplayName("회원탈퇴 성공")
+    void withdraw() throws Exception {
+        //expected
+        mockMvc.perform(post("/riders/withdraw").with(user(principalDetails)).with(csrf()))
+                .andExpect(status().isOk());
+
     }
 
     @Test

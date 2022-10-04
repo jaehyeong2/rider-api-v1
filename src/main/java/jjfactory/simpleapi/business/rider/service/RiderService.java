@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @Service
 public class RiderService {
-    private final RiderRepository riderRepository;
     private final InsuranceHistoryRepository insuranceHistoryRepository;
 
     @Transactional(readOnly = true)
@@ -35,7 +34,6 @@ public class RiderService {
 
         return "Y";
     }
-
 
     private void insuranceValidationCheck(Rider rider) {
         boolean insuranceStatus = rider.isInsuranceApply();

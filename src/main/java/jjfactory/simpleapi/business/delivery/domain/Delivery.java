@@ -50,11 +50,12 @@ public class Delivery {
 
     @LastModifiedDate
     private LocalDateTime modifiedDate;
-
     @Builder
-    public Delivery(Rider rider, long balance, Address address, String receiveCallId, DeliveryStatus deliveryStatus, LocalDateTime requestTime, LocalDateTime appointTime, LocalDateTime pickUpTime, LocalDateTime completeTime, LocalDateTime modifiedDate, String clientName) {
+    public Delivery(Rider rider, String deliveryId, Address address, String clientName, String receiveCallId, DeliveryStatus deliveryStatus, LocalDateTime requestTime, LocalDateTime appointTime, LocalDateTime pickUpTime, LocalDateTime completeTime, LocalDateTime modifiedDate) {
         this.rider = rider;
+        this.deliveryId = deliveryId;
         this.address = address;
+        this.clientName = clientName;
         this.receiveCallId = receiveCallId;
         this.deliveryStatus = deliveryStatus;
         this.requestTime = requestTime;
@@ -62,7 +63,6 @@ public class Delivery {
         this.pickUpTime = pickUpTime;
         this.completeTime = completeTime;
         this.modifiedDate = modifiedDate;
-        this.clientName = clientName;
     }
 
     public static Delivery create(Rider rider, DeliveryCreate dto){
@@ -88,8 +88,8 @@ public class Delivery {
     public void pickUp() {
         this.pickUpTime = LocalDateTime.now();
     }
-    public void complete() {
-        this.completeTime = LocalDateTime.now();
+    public void complete(LocalDateTime completeTime) {
+        this.completeTime = completeTime;
     }
 
 }
