@@ -25,7 +25,6 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-@EnableConfigurationProperties
 @ExtendWith(MockitoExtension.class)
 class InsuranceResultServiceTest {
     @InjectMocks

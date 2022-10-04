@@ -2,6 +2,7 @@ package jjfactory.simpleapi.business.balance.dto.res;
 
 
 import jjfactory.simpleapi.business.balance.domain.ReceiveBalance;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -13,6 +14,7 @@ public class ReceiveBalanceRes {
     private int balance;
     private String batchDate;
 
+    @Builder
     public ReceiveBalanceRes(int balance, String batchDate) {
         this.balance = balance;
         this.batchDate = batchDate;
