@@ -2,6 +2,7 @@ package jjfactory.simpleapi.business.delivery.dto.req;
 
 
 import jjfactory.simpleapi.business.delivery.domain.Delivery;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,6 +15,7 @@ public class DeliveryEndReq {
     private String deliveryId;
     private String endTime;
 
+    @Builder
     public DeliveryEndReq(String driverId, String deliveryId, String endTime) {
         this.driverId = driverId;
         this.deliveryId = deliveryId;
