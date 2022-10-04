@@ -72,7 +72,6 @@ public class AuthService {
 
         matchPassword(dto.getPassword(),rider.getPassword());
         String token = createToken(rider);
-//        res.setHeader("Authorization",token);
 
         return new TokenRes(token);
     }
