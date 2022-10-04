@@ -1,19 +1,15 @@
 package jjfactory.simpleapi.business.rider.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jjfactory.simpleapi.business.balance.api.ReceiveBalanceApi;
 import jjfactory.simpleapi.business.rider.dto.req.LoginReq;
 import jjfactory.simpleapi.business.rider.dto.req.RiderCreate;
-import jjfactory.simpleapi.business.rider.repository.RiderRepository;
 import jjfactory.simpleapi.business.rider.service.AuthService;
-import org.assertj.core.api.Assertions;
+import jjfactory.simpleapi.business.rider.service.RiderService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.FilterType;
@@ -22,29 +18,27 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.WebApplicationContext;
-
-import javax.persistence.EntityManager;
 
 import java.nio.charset.StandardCharsets;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = AuthApi.class,
+@WebMvcTest(controllers = RiderApi.class,
         excludeFilters = {
                 @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebSecurityConfigurerAdapter.class)}
 )
-class AuthApiTest {
+class RiderApiTest {
     @Autowired
     private WebApplicationContext context;
     @MockBean
     AuthService authService;
+    @MockBean
+    RiderService riderService;
     @Autowired
     MockMvc mockMvc;
     @Autowired
@@ -68,7 +62,7 @@ class AuthApiTest {
                 .password("1234").build();
 
         //expected
-        mockMvc.perform(post("/auth/login").content(mapper.writeValueAsString(loginReq))
+        mockMvc.perform(post("/riders/login").content(mapper.writeValueAsString(loginReq))
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
@@ -101,7 +95,7 @@ class AuthApiTest {
                         "text/plain", "test file".getBytes(StandardCharsets.UTF_8) );
 
         //expected
-        mockMvc.perform(multipart("/auth/signup")
+        mockMvc.perform(multipart("/riders/signup")
                         .file(image)
                         .file(dto)
                         .contentType(MediaType.MULTIPART_FORM_DATA)

@@ -8,5 +8,6 @@ import java.util.Optional;
 public interface RiderRepository extends JpaRepository<Rider,Long> {
     Optional<Rider> findByPhone(String phone);
     Optional<Rider> findByDriverId(String driverId);
+    Optional<Rider> findByLoginId(String loginId);
 
 }

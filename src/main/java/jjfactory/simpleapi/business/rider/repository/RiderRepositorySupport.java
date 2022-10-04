@@ -2,7 +2,6 @@ package jjfactory.simpleapi.business.rider.repository;
 
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jjfactory.simpleapi.business.rider.domain.QRider;
 import jjfactory.simpleapi.business.rider.domain.Rider;
 import jjfactory.simpleapi.global.ex.BusinessException;
 import jjfactory.simpleapi.global.ex.ErrorCode;
@@ -15,7 +14,7 @@ import static jjfactory.simpleapi.business.rider.domain.QRider.*;
 
 @RequiredArgsConstructor
 @Repository
-public class RiderQueryRepository {
+public class RiderRepositorySupport {
     private final JPAQueryFactory queryFactory;
 
     public Rider findRiderByDriverId(String driverId){
