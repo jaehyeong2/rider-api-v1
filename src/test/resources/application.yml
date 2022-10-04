@@ -20,3 +20,5 @@ hash: test1111test1111test1111ttdd11@#
 
 app:
   filePath: test/test
+
+retrofitUrl: http://localhost
