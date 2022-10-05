@@ -5,8 +5,11 @@ import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jjfactory.simpleapi.business.accident.domain.Accident;
+import jjfactory.simpleapi.business.delivery.domain.QBalanceHistory;
 import jjfactory.simpleapi.business.delivery.dto.DeliveryRes;
 import jjfactory.simpleapi.business.delivery.dto.RiderDeliveryRes;
+import jjfactory.simpleapi.business.rider.domain.QRider;
+import jjfactory.simpleapi.business.seller.dto.res.SellerDeliveryRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -21,6 +24,7 @@ import java.util.List;
 
 import static jjfactory.simpleapi.business.delivery.domain.QBalanceHistory.balanceHistory;
 import static jjfactory.simpleapi.business.delivery.domain.QDelivery.*;
+import static jjfactory.simpleapi.business.rider.domain.QRider.*;
 
 @Repository
 @RequiredArgsConstructor
@@ -77,6 +81,35 @@ public class DeliveryRepositorySupport {
                 .where(delivery.appointTime.between(convertedStart, convertedEnd),
                         delivery.id.isNotNull(),
                         delivery.rider.id.eq(riderId))
+                .fetch().size();
+
+        return new PageImpl<>(deliveries,pageable,count);
+    }
+
+    public Page<SellerDeliveryRes> findSellerDeliveries(Pageable pageable, String startDate, String endDate, String sellerName){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime convertedStart = LocalDateTime.parse(startDate, formatter);
+        LocalDateTime convertedEnd = LocalDateTime.parse(endDate, formatter);
+
+        List<SellerDeliveryRes> deliveries = queryFactory.select(Projections.constructor(SellerDeliveryRes.class, delivery, balanceHistory, rider))
+                .from(delivery)
+                .innerJoin(balanceHistory).on(balanceHistory.delivery.eq(delivery))
+                .innerJoin(rider).on(delivery.rider.eq(rider))
+                .where(delivery.appointTime.between(convertedStart, convertedEnd),
+                        delivery.id.isNotNull(),
+                        delivery.rider.seller.name.eq(sellerName))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(delivery.appointTime.desc())
+                .fetch();
+
+        int count = queryFactory.select(Projections.constructor(SellerDeliveryRes.class, delivery, balanceHistory, rider))
+                .from(delivery)
+                .innerJoin(balanceHistory).on(balanceHistory.delivery.eq(delivery))
+                .innerJoin(rider).on(delivery.rider.eq(rider))
+                .where(delivery.appointTime.between(convertedStart, convertedEnd),
+                        delivery.id.isNotNull(),
+                        delivery.rider.seller.name.eq(sellerName))
                 .fetch().size();
 
         return new PageImpl<>(deliveries,pageable,count);

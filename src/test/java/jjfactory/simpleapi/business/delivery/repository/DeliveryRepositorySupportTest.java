@@ -9,6 +9,7 @@ import jjfactory.simpleapi.business.delivery.domain.Delivery;
 import jjfactory.simpleapi.business.delivery.dto.DeliveryRes;
 import jjfactory.simpleapi.business.rider.domain.Rider;
 import jjfactory.simpleapi.business.seller.domain.Seller;
+import jjfactory.simpleapi.business.seller.dto.res.SellerDeliveryRes;
 import jjfactory.simpleapi.global.dto.req.MyPageReq;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -28,6 +29,7 @@ import java.util.List;
 
 import static jjfactory.simpleapi.business.delivery.domain.QBalanceHistory.balanceHistory;
 import static jjfactory.simpleapi.business.delivery.domain.QDelivery.delivery;
+import static jjfactory.simpleapi.business.rider.domain.QRider.rider;
 import static org.assertj.core.api.Assertions.*;
 
 
@@ -106,21 +108,63 @@ class DeliveryRepositorySupportTest {
                 .isAfter(LocalDateTime.parse(deliveries.get(6).getAppointTime(),formatter));
     }
 
+    @Test
+    @DisplayName("지점 하위 라이더 운행 아력조회 성공")
+    void findSellerDeliveries() {
+        //given
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        LocalDateTime convertedStart = LocalDateTime.parse("2022-08-01 00:00:00", formatter);
+        LocalDateTime convertedEnd = LocalDateTime.parse("2022-09-30 23:59:59", formatter);
+
+        PageRequest pageable = new MyPageReq(1, 10).of();
+
+        //when
+        List<SellerDeliveryRes> deliveries = queryFactory.select(Projections.constructor(SellerDeliveryRes.class, delivery, balanceHistory, rider))
+                .from(delivery)
+                .innerJoin(balanceHistory).on(balanceHistory.delivery.eq(delivery))
+                .innerJoin(rider).on(delivery.rider.eq(rider))
+                .where(delivery.appointTime.between(convertedStart, convertedEnd),
+                        delivery.id.isNotNull(),
+                        delivery.rider.seller.name.eq("sellerA"))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(delivery.appointTime.desc())
+                .fetch();
+
+        int count = queryFactory.select(Projections.constructor(SellerDeliveryRes.class, delivery, balanceHistory, rider))
+                .from(delivery)
+                .innerJoin(balanceHistory).on(balanceHistory.delivery.eq(delivery))
+                .innerJoin(rider).on(delivery.rider.eq(rider))
+                .where(delivery.appointTime.between(convertedStart, convertedEnd),
+                        delivery.id.isNotNull(),
+                        delivery.rider.seller.name.eq("sellerA"))
+                .fetch().size();
+
+        //then
+        assertThat(count).isEqualTo(7);
+        assertThat(deliveries.get(0).getRiderLoginId()).isEqualTo("wogud222");
+        assertThat(deliveries.get(0).getBalance()).isEqualTo(100);
+        assertThat(LocalDateTime.parse(deliveries.get(0).getAppointTime(),formatter))
+                .isAfter(LocalDateTime.parse(deliveries.get(6).getAppointTime(),formatter));
+    }
+
     private Rider createRiderAndSeller() {
-        Rider rider = Rider.builder()
-                .driverId("GG1234")
-                .name("tester")
-                .password("1234")
-                .phone("01012341234")
-                .build();
-
-        em.persist(rider);
-
         Seller findSeller = Seller.builder()
                 .name("sellerA")
                 .sellerCode("dddd1111wwww")
                 .build();
         em.persist(findSeller);
+
+        Rider rider = Rider.builder()
+                .loginId("wogud222")
+                .driverId("GG1234")
+                .name("tester")
+                .password("1234")
+                .phone("01012341234")
+                .seller(findSeller)
+                .build();
+
+        em.persist(rider);
         return rider;
     }
 
