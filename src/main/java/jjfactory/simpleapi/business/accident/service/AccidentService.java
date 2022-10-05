@@ -3,6 +3,7 @@ package jjfactory.simpleapi.business.accident.service;
 
 import jjfactory.simpleapi.business.accident.domain.Accident;
 import jjfactory.simpleapi.business.accident.dto.req.AccidentCreate;
+import jjfactory.simpleapi.business.accident.dto.res.AccidentRes;
 import jjfactory.simpleapi.business.accident.repository.AccidentRepository;
 import jjfactory.simpleapi.business.accident.repository.AccidentRepositorySupport;
 import jjfactory.simpleapi.business.delivery.domain.Delivery;
@@ -34,7 +35,7 @@ public class AccidentService {
     }
 
     @Transactional(readOnly = true)
-    public PagingRes<Accident> findMyAccidentsByPhone(Pageable pageable, Rider rider){
+    public PagingRes<AccidentRes> findMyAccidentsByPhone(Pageable pageable, Rider rider){
         return new PagingRes(accidentRepositorySupport.findAccidentsByPhone(pageable,rider.getPhone()));
     }
 }

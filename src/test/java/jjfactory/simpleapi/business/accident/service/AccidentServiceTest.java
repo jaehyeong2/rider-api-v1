@@ -105,7 +105,7 @@ class AccidentServiceTest {
                 .thenReturn(new PageImpl<>(list,pageRequest,list.size()));
 
         //when
-        PagingRes<Accident> result = accidentService.findMyAccidentsByPhone(pageRequest, rider);
+        PagingRes<AccidentRes> result = accidentService.findMyAccidentsByPhone(pageRequest, rider);
 
         //then
         assertThat(result).isNotNull();

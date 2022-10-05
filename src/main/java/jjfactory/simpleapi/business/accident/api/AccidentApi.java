@@ -2,6 +2,7 @@ package jjfactory.simpleapi.business.accident.api;
 
 import jjfactory.simpleapi.business.accident.domain.Accident;
 import jjfactory.simpleapi.business.accident.dto.req.AccidentCreate;
+import jjfactory.simpleapi.business.accident.dto.res.AccidentRes;
 import jjfactory.simpleapi.business.accident.service.AccidentService;
 import jjfactory.simpleapi.global.config.auth.PrincipalDetails;
 import jjfactory.simpleapi.global.dto.req.MyPageReq;
@@ -18,9 +19,9 @@ public class AccidentApi {
     private final AccidentService accidentService;
 
     @GetMapping
-    public ApiPageRes<Accident> findMyAccidents(@AuthenticationPrincipal PrincipalDetails principalDetails,
-                                                @RequestParam(required = false, defaultValue = "1")int page,
-                                                @RequestParam(required = false, defaultValue = "10")int size){
+    public ApiPageRes<AccidentRes> findMyAccidents(@AuthenticationPrincipal PrincipalDetails principalDetails,
+                                                   @RequestParam(required = false, defaultValue = "1")int page,
+                                                   @RequestParam(required = false, defaultValue = "10")int size){
         return new ApiPageRes<>(accidentService.findMyAccidentsByPhone(new MyPageReq(page,size).of(),principalDetails.getRider()));
     }
 
