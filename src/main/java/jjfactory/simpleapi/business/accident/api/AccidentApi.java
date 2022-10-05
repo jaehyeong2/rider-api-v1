@@ -17,11 +17,6 @@ import org.springframework.web.bind.annotation.*;
 public class AccidentApi {
     private final AccidentService accidentService;
 
-    @GetMapping("/seller")
-    public ApiRes<Integer> findCompensationsBySellerCode(@RequestParam String sellerCode){
-        return new ApiRes<>(accidentService.findTotalCompensation(sellerCode));
-    }
-
     @GetMapping
     public ApiPageRes<Accident> findMyAccidents(@AuthenticationPrincipal PrincipalDetails principalDetails,
                                                 @RequestParam(required = false, defaultValue = "1")int page,

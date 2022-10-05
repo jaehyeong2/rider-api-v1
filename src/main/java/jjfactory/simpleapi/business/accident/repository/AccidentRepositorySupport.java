@@ -9,6 +9,7 @@ import jjfactory.simpleapi.business.accident.dto.res.AccidentRes;
 import jjfactory.simpleapi.business.delivery.domain.QDelivery;
 import jjfactory.simpleapi.business.rider.domain.QRider;
 import jjfactory.simpleapi.business.seller.domain.QSeller;
+import jjfactory.simpleapi.business.seller.dto.res.SellerAccidentRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -45,7 +46,30 @@ public class AccidentRepositorySupport {
         return new PageImpl<>(accidents,pageable,total);
     }
 
-    public Integer findTotalCompensation(String sellerCode){
+    public Page<SellerAccidentRes> findAccidentsBySellerName(Pageable pageable, String sellerName){
+        List<SellerAccidentRes> accidents = queryFactory
+                .select(Projections.constructor(SellerAccidentRes.class, accident, delivery, rider))
+                .from(accident)
+                .innerJoin(delivery).on(accident.delivery.eq(delivery))
+                .innerJoin(rider).on(delivery.rider.eq(rider))
+                .where(rider.seller.name.eq(sellerName))
+                .orderBy(accident.accidentTime.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        int total = queryFactory
+                .select(Projections.constructor(SellerAccidentRes.class, accident, delivery, rider))
+                .from(accident)
+                .innerJoin(delivery).on(accident.delivery.eq(delivery))
+                .innerJoin(rider).on(delivery.rider.eq(rider))
+                .where(rider.seller.name.eq(sellerName))
+                .fetch().size();
+
+        return new PageImpl<>(accidents,pageable,total);
+    }
+
+    public Integer findTotalCompensation(String sellerName){
         return queryFactory.select(accident.compensation.sum())
                 .from(accident)
                 .innerJoin(delivery)
@@ -53,8 +77,8 @@ public class AccidentRepositorySupport {
                 .innerJoin(rider)
                 .on(delivery.rider.id.eq(rider.id))
                 .innerJoin(seller)
-                .on(seller.sellerCode.eq(sellerCode))
-                .where(seller.sellerCode.eq(sellerCode))
+                .on(seller.name.eq(sellerName))
+                .where(seller.name.eq(sellerName))
                 .fetchOne();
     }
 }

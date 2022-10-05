@@ -37,10 +37,4 @@ public class AccidentService {
     public PagingRes<Accident> findMyAccidentsByPhone(Pageable pageable, Rider rider){
         return new PagingRes(accidentRepositorySupport.findAccidentsByPhone(pageable,rider.getPhone()));
     }
-
-    @Transactional(readOnly = true)
-    public Integer findTotalCompensation(String sellerCode){
-        return accidentRepositorySupport.findTotalCompensation(sellerCode);
-    }
-
 }

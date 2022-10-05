@@ -110,14 +110,4 @@ class AccidentServiceTest {
         //then
         assertThat(result).isNotNull();
     }
-
-    @Test
-    @DisplayName("보상금 조회 성공")
-    void findTotalCompensation() {
-        //when
-        Integer totalCompensation = accidentService.findTotalCompensation("seller12342");
-
-        //then
-        assertThat(totalCompensation).isNotNull();
-    }
 }

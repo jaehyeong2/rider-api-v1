@@ -8,6 +8,7 @@ import jjfactory.simpleapi.business.delivery.domain.Address;
 import jjfactory.simpleapi.business.delivery.domain.Delivery;
 import jjfactory.simpleapi.business.rider.domain.Rider;
 import jjfactory.simpleapi.business.seller.domain.Seller;
+import jjfactory.simpleapi.business.seller.dto.res.SellerAccidentRes;
 import jjfactory.simpleapi.global.dto.req.MyPageReq;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -70,6 +71,39 @@ class AccidentRepositorySupportTest {
     }
 
     @Test
+    @DisplayName("지점 사고 조회 성공")
+    void findSellerAccidents() {
+        //given
+        PageRequest pageable = new MyPageReq(1, 10).of();
+
+        //when
+        List<SellerAccidentRes> accidents = queryFactory
+                .select(Projections.constructor(SellerAccidentRes.class, accident, delivery, rider))
+                .from(accident)
+                .innerJoin(delivery).on(accident.delivery.eq(delivery))
+                .innerJoin(rider).on(delivery.rider.eq(rider))
+                .where(rider.seller.name.eq("sellerA"))
+                .orderBy(accident.accidentTime.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        int total = queryFactory
+                .select(Projections.constructor(SellerAccidentRes.class, accident, delivery, rider))
+                .from(accident)
+                .innerJoin(delivery).on(accident.delivery.eq(delivery))
+                .innerJoin(rider).on(delivery.rider.eq(rider))
+                .where(rider.seller.name.eq("sellerA"))
+                .fetch().size();
+
+        //then
+        assertThat(total).isEqualTo(15);
+        assertThat(accidents.get(0).getAccidentTime()).isEqualTo("2022-09-30 15:00:00");
+        assertThat(accidents.get(0).getCompensation()).isEqualTo(1000);
+        assertThat(accidents.get(0).getRiderName()).isEqualTo("tester");
+    }
+
+    @Test
     @DisplayName("운영사 총 보상금 조회")
     void findTotalCompensation() {
         //when
@@ -113,20 +147,21 @@ class AccidentRepositorySupportTest {
     }
 
     private Rider createRiderAndSeller() {
-        Rider rider = Rider.builder()
-                .driverId("GG1234")
-                .name("tester")
-                .password("1234")
-                .phone("01012341234")
-                .build();
-
-        em.persist(rider);
-
         Seller findSeller = Seller.builder()
                 .name("sellerA")
                 .sellerCode("dddd1111wwww")
                 .build();
         em.persist(findSeller);
+
+        Rider rider = Rider.builder()
+                .driverId("GG1234")
+                .name("tester")
+                .password("1234")
+                .seller(findSeller)
+                .phone("01012341234")
+                .build();
+
+        em.persist(rider);
         return rider;
     }
 }
