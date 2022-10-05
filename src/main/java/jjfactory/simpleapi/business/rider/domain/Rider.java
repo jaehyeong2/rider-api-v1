@@ -4,6 +4,7 @@ package jjfactory.simpleapi.business.rider.domain;
 import jjfactory.simpleapi.business.rider.dto.req.RiderCreate;
 import jjfactory.simpleapi.business.seller.domain.Seller;
 import jjfactory.simpleapi.global.entity.BaseEntity;
+import jjfactory.simpleapi.global.entity.DeleteStatus;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,6 +12,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Comment;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -58,12 +60,13 @@ public class Rider extends BaseEntity {
     @ElementCollection(fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
     private List<Role> roles = new ArrayList<>();
-
     @Builder
-    public Rider(Seller seller, String driverId,String loginId, String name, String phone, String password, int gender, String bikeNumber, String region, String imagePath, String policyNumber, boolean insuranceApply,List<Role> roles) {
+    public Rider(LocalDateTime createDate, LocalDateTime modifiedDate, DeleteStatus deleteStatus, LocalDateTime deleteDate, Seller seller, String loginId, String ssn, String driverId, String name, String phone, String password, int gender, String bikeNumber, String region, String imagePath, String policyNumber, boolean insuranceApply, List<Role> roles) {
+        super(createDate, modifiedDate, deleteStatus, deleteDate);
         this.seller = seller;
-        this.driverId = driverId;
         this.loginId = loginId;
+        this.ssn = ssn;
+        this.driverId = driverId;
         this.name = name;
         this.phone = phone;
         this.password = password;
