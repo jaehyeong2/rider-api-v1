@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jjfactory.simpleapi.business.accident.api.AccidentApi;
 import jjfactory.simpleapi.business.insurance.dto.res.EndorsementCancelRes;
 import jjfactory.simpleapi.business.insurance.dto.res.EndorsementRes;
+import jjfactory.simpleapi.business.insurance.dto.res.RiderCountRes;
 import jjfactory.simpleapi.business.insurance.dto.res.UnderWritingRes;
 import jjfactory.simpleapi.business.insurance.service.InsuranceResultService;
 import org.junit.Before;
@@ -28,6 +29,8 @@ import org.springframework.web.context.WebApplicationContext;
 
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -68,11 +71,15 @@ class InsuranceApiTest {
 
         List<UnderWritingRes> results = List.of(result);
 
+        //stub
+        given(insuranceResultService.underWritingResult(any())).willReturn(new RiderCountRes(results.size()));
+
         //expected
         mockMvc.perform(post("/insurance/underwriting")
                 .content(mapper.writeValueAsString(results))
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.count").value(1L));
     }
 
     @Test
@@ -88,11 +95,15 @@ class InsuranceApiTest {
 
         List<EndorsementRes> results = List.of(result);
 
+        //stub
+        given(insuranceResultService.endorsementResult(any())).willReturn(new RiderCountRes(results.size()));
+
         //expected
         mockMvc.perform(post("/insurance/endorsement")
                         .content(mapper.writeValueAsString(results))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.count").value(1L));
     }
 
     @Test
@@ -108,10 +119,14 @@ class InsuranceApiTest {
 
         List<EndorsementCancelRes> results = List.of(result);
 
+        //stub
+        given(insuranceResultService.cancelResult(any())).willReturn(new RiderCountRes(results.size()));
+
         //expected
         mockMvc.perform(post("/insurance/cancel")
                         .content(mapper.writeValueAsString(results))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.result.count").value(1L));
     }
 }
