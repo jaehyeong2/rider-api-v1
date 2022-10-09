@@ -49,19 +49,18 @@ public class InsuranceRequestService {
     public void underWritingBatch(){
         List<InsuranceHistory> histories = insuranceHistoryRepositorySupport.findRequestsByInsuranceStepToday(2);
         List<UnderWritingReq> underWritingReqList = histories.stream()
-                .map(InsuranceHistory::getRider)
-                .map(UnderWritingReq::new)
+                .map(req -> new UnderWritingReq(req.getRider()))
                 .collect(Collectors.toList());
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl +"/rider/underwriting");
         restTemplate.postForObject(builder.toUriString(),underWritingReqList,String.class);
     }
+
     @Scheduled(cron = "00 50 19 * * *")
     public void endorsementBatch(){
         List<InsuranceHistory> histories = insuranceHistoryRepositorySupport.findRequestsByInsuranceStepYesterday(5);
         List<EndorsementReq> endorsementReqList = histories.stream()
-                .map(InsuranceHistory::getRider)
-                .map(EndorsementReq::new)
+                .map(req -> new EndorsementReq(req.getRider()))
                 .collect(Collectors.toList());
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl +"/rider/endorsement");
@@ -72,8 +71,7 @@ public class InsuranceRequestService {
     public void withDrawRiderBatch(){
         List<InsuranceHistory> histories = insuranceHistoryRepositorySupport.findRequestsByInsuranceStepYesterday(7);
         List<RiderWithdrawReq> withdrawReqList = histories.stream()
-                .map(InsuranceHistory::getRider)
-                .map(RiderWithdrawReq::new)
+                .map(req -> new RiderWithdrawReq(req.getRider()))
                 .collect(Collectors.toList());
 
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serverUrl +"/rider/withdraw");
