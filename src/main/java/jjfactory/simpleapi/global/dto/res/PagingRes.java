@@ -1,7 +1,6 @@
 package jjfactory.simpleapi.global.dto.res;
 
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -9,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-@AllArgsConstructor
 @NoArgsConstructor
 @Getter
 public class PagingRes<T> {
@@ -17,6 +15,13 @@ public class PagingRes<T> {
     private int totalPage;
     private long totalCount;
     private List<T> resultList;
+
+    public PagingRes(int currentPage, int totalPage, long totalCount, List<T> resultList) {
+        this.currentPage = currentPage;
+        this.totalPage = totalPage;
+        this.totalCount = totalCount;
+        this.resultList = resultList;
+    }
 
     public PagingRes(Page<T> page) {
         this.currentPage = page.getPageable().getPageNumber()+1;

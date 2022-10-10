@@ -2,7 +2,6 @@ package jjfactory.simpleapi.business.insurance.dto.req;
 
 
 import jjfactory.simpleapi.business.rider.domain.Rider;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.ToString;

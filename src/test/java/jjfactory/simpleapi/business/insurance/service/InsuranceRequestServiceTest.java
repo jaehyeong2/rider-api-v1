@@ -34,8 +34,7 @@ class InsuranceRequestServiceTest {
         String expectedApiUrl = "http://localhost/rider/underwriting";
         String expectedJsonResponse = "ok";
 
-        mockServer
-                .expect(requestTo(expectedApiUrl))
+        mockServer.expect(requestTo(expectedApiUrl))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess(expectedJsonResponse, MediaType.APPLICATION_JSON));
 
