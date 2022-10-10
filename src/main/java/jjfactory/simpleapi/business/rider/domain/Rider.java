@@ -83,6 +83,7 @@ public class Rider extends BaseEntity {
         return Rider.builder()
                 .seller(seller)
                 .loginId(req.getLoginId())
+                .ssn(req.getSsn())
                 .driverId("DD" + req.getPhone().substring(3))
                 .gender(req.getGender())
                 .region(req.getRegion())

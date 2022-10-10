@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Slf4j
@@ -40,15 +39,9 @@ public class AuthService {
         Seller seller = sellerRepository.findBySellerCode(req.getSellerCode());
 
         String encPassword = passwordEncoder.encode(req.getPassword());
-        Rider rider = null;
-        try {
-            rider = Rider.create(req, seller,encPassword);
-            riderRepository.save(rider);
 
-        } catch (Exception e) {
-            throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR);
-        }
-
+        Rider rider = Rider.create(req, seller,encPassword);
+        riderRepository.save(rider);
 
         if(InsuranceImage != null){
             String folderPath = rider.getId() + "/";
@@ -106,15 +99,4 @@ public class AuthService {
         }
     }
 
-    private String aesEncode(String str) throws Exception {
-        AES_Encryption aes = new AES_Encryption();
-        String encrypt = aes.encrypt(str);
-        return encrypt;
-    }
-
-    private String aesDecode(String str) throws Exception {
-        AES_Encryption aes = new AES_Encryption();
-        String decrypt = aes.decrypt(str);
-        return decrypt;
-    }
 }
