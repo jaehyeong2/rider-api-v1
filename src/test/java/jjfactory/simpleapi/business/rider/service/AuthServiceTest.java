@@ -1,5 +1,7 @@
 package jjfactory.simpleapi.business.rider.service;
 
+import jjfactory.simpleapi.business.insurance.domain.InsuranceHistory;
+import jjfactory.simpleapi.business.insurance.repository.InsuranceHistoryRepository;
 import jjfactory.simpleapi.business.rider.domain.Rider;
 import jjfactory.simpleapi.business.rider.domain.Role;
 import jjfactory.simpleapi.business.rider.dto.req.LoginReq;
@@ -18,6 +20,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -44,8 +47,10 @@ class AuthServiceTest {
     private TokenProvider tokenProvider;
     @Mock
     private SellerRepository sellerRepository;
-
+    @Spy
     private AES_Encryption encryption;
+    @Mock
+    private InsuranceHistoryRepository insuranceHistoryRepository;
 
     private static final String testToken = "sadasdasdasdas";
 
@@ -53,9 +58,11 @@ class AuthServiceTest {
     @DisplayName("회원가입 성공")
     void signUp() throws Exception {
         //given
+        encryption.setKey("test1111test1111test1111ttdd11@#");
+
         RiderCreate req = RiderCreate.builder().loginId("wogud2").name("이재형")
                 .password("1234")
-                .ssn("9608221111111")
+                .ssn("c0c9prmlYPL+BGPxXmjESA==")
                 .phone("01012341234")
                 .build();
 
@@ -63,6 +70,9 @@ class AuthServiceTest {
                 .loginId("wogud2")
                 .password("1234")
                 .build();
+
+        InsuranceHistory history = InsuranceHistory.builder().rider(rider)
+                .insuranceStep(2).build();
 
         Seller seller = Seller.builder()
                 .name("운영사a")
@@ -72,6 +82,7 @@ class AuthServiceTest {
         //stub
         when(sellerRepository.findBySellerCode(any())).thenReturn(seller);
         when(riderRepository.save(any())).thenReturn(rider);
+        when(insuranceHistoryRepository.save(any())).thenReturn(history);
 
         //when
         Long res = authService.signUp(req, null);

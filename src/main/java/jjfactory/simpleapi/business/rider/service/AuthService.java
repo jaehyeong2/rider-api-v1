@@ -1,6 +1,9 @@
 package jjfactory.simpleapi.business.rider.service;
 
 
+import jjfactory.simpleapi.business.insurance.domain.HistoryType;
+import jjfactory.simpleapi.business.insurance.domain.InsuranceHistory;
+import jjfactory.simpleapi.business.insurance.repository.InsuranceHistoryRepository;
 import jjfactory.simpleapi.business.rider.domain.Rider;
 import jjfactory.simpleapi.business.rider.dto.req.LoginReq;
 import jjfactory.simpleapi.business.rider.dto.req.RiderCreate;
@@ -31,6 +34,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RiderRepository riderRepository;
     private final SellerRepository sellerRepository;
+    private final InsuranceHistoryRepository insuranceHistoryRepository;
 
     public Long signUp(RiderCreate req, MultipartFile InsuranceImage) {
         // 주민등록번호 형태 체크 (13자리인지. 하이픈 없는지)
@@ -42,6 +46,9 @@ public class AuthService {
 
         Rider rider = Rider.create(req, seller,encPassword);
         riderRepository.save(rider);
+
+        InsuranceHistory insuranceHistory = InsuranceHistory.create(rider, HistoryType.REQUEST, 2);
+        insuranceHistoryRepository.save(insuranceHistory);
 
         if(InsuranceImage != null){
             String folderPath = rider.getId() + "/";
@@ -82,9 +89,16 @@ public class AuthService {
         }
     }
 
-    public void ssnCheck(String number){
-        hyphenCheck(number);
-        ssnLengthCheck(number);
+    public void ssnCheck(String encSsn){
+        String rawSsn = "";
+        try {
+            rawSsn = aesDecode(encSsn);
+        } catch (Exception e) {
+            log.error("{}",e);
+            throw new BusinessException(ErrorCode.INVALID_ENCODE_TYPE);
+        }
+        hyphenCheck(rawSsn);
+        ssnLengthCheck(rawSsn);
     }
 
     private void hyphenCheck(String number) {
@@ -99,4 +113,15 @@ public class AuthService {
         }
     }
 
+    private String aesEncode(String str) throws Exception {
+        AES_Encryption aes = new AES_Encryption();
+        String encrypt = aes.encrypt(str);
+        return encrypt;
+    }
+
+    private String aesDecode(String str) throws Exception {
+        AES_Encryption aes = new AES_Encryption();
+        String decrypt = aes.decrypt(str);
+        return decrypt;
+    }
 }
